@@ -17,10 +17,16 @@ def start_game():
         if not name:
             return "Name is required!", 400
 
+        # Initialize a list to store detailed results
+        detailed_results = []
+
         # Question 1
         jaweb1 = request.form.get('question1', '').strip().upper()
         if jaweb1 in ["MA ELE JLEDE", "MA ELE JALAD"]:
             score += 1
+            detailed_results.append("Question 1: Correct")
+        else:
+            detailed_results.append("Question 1: Incorrect")
 
         # Question 2
         jaweb2 = request.form.get('question2', '').strip().lower()
@@ -28,26 +34,38 @@ def start_game():
                       "ba3mel hal shi", "b3mel hal shi", "b3mel hal shi ma3ak", "b3mel hal shi jeye", 
                       "brou7", "brou7 ma3ak", "brou7 jeye", "brou7 ma3ak jeye"]:
             score += 1
+            detailed_results.append("Question 2: Correct")
+        else:
+            detailed_results.append("Question 2: Incorrect")
 
         # Question 3
         jaweb3 = request.form.get('question3', '').strip().lower()
         if jaweb3 in ["nfokho", "nfekho"]:
             score += 1
+            detailed_results.append("Question 3: Correct")
+        else:
+            detailed_results.append("Question 3: Incorrect")
 
         # Question 4
         jaweb4 = request.form.get('question4', '').strip().lower()
         if jaweb4 in ["mukhtal 3a2liyan", "mokhtal 3aqliyan", "mokhtal 3a2li", "mokhtal 3aqli", "mokhtal bi 3a2lo", 
                       "mokhtal 3aqli", "mahboul", "mastoul"]:
             score += 1
+            detailed_results.append("Question 4: Correct")
+        else:
+            detailed_results.append("Question 4: Incorrect")
 
         # Question 5
         jaweb5 = request.form.get('question5', '').strip().lower()
         if jaweb5 in ["shou beke", "ashou beke"]:
             score += 1
+            detailed_results.append("Question 5: Correct")
+        else:
+            detailed_results.append("Question 5: Incorrect")
 
         # Final result
         result = f"Your final score is {score} out of 5. You got {score / 5 * 100}% correct."
-        return render_template('result.html', result=result, name=name)
+        return render_template('result.html', result=result, name=name, detailed_results=detailed_results)
 
     return render_template('game.html')
 
