@@ -8,14 +8,6 @@
 <body>
     <h1>Thank you for playing, {{ name }}!</h1>
     <h2>{{ result }}</h2>
-
-    <h3>Detailed Results:</h3>
-    <ul>
-        {% for detail in detailed_results %}
-        <li>{{ detail }}</li>
-        {% endfor %}
-    </ul>
-
-    <a href="https://naim-cspy.github.io/slang/game.html">Play Again</a>
+    <a href="/"><button>{{ score }}/{{ total }}</button></a>
 </body>
 </html>
