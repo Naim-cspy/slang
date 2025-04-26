@@ -1,73 +1,51 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 # Create a Flask app instance
 app = Flask(__name__)
 
-# Define a route and a view function
+# Define the questions and answers 
+questions = [
+    {"question": "shou ya3ne 'MEJ'?", "answers": ["MA ELE JLEDE", "MA ELE JALAD"]},
+    {"question": "shou ma3na 'bshil'?", "answers": [
+        "ana ma3ak", "jeye", "ana jeye", "ana ma3ak jeye", "ana jeye ma3ak",
+        "bfout ma3ak", "ba3mel hal shi", "b3mel hal shi", "b3mel hal shi ma3ak",
+        "b3mel hal shi jeye", "brou7", "brou7 ma3ak", "brou7 jeye", "brou7 ma3ak jeye"
+    ]},
+    {"question": "shou ya3ne 'NF5'?", "answers": ["nfokho", "nfekho"]},
+    {"question": "shou ya3ne 'Mokh'?", "answers": [
+        "mukhtal 3a2liyan", "mukhtal 3aqliyan", "mukhtal 3a2li", "mukhtal 3aqli",
+        "mukhtal bi 3a2lo", "mokhtal 3a2liyan", "mokhtal 3aqliyan", "mahboul", "mastoul"
+    ]},
+    {"question": "shou ya3ne 'ashbike'?", "answers": ["shou beke", "ashou beke"]}
+]
+
+# Route for the home page
 @app.route('/')
-def main():
-    return render_template('game.html')  # Render the game template as the homepage
+def index():
+    return render_template('index.html')
 
-# Start the game route
-@app.route('/start_game', methods=['GET', 'POST'])
-def start_game():
+# Route for the game page
+@app.route('/game', methods=['GET', 'POST'])
+def game():
     if request.method == 'POST':
+        user_answers = []
         score = 0
-        name = request.form.get('name', '').strip()
-        if not name:
-            return "Name is required!", 400
+        for i, question in enumerate(questions):
+            user_answer = request.form.get(f'question{i + 1}', '').strip().lower()
+            user_answers.append(user_answer)
+            if user_answer in [answer.lower() for answer in question['answers']]:
+                score += 1
+        return redirect(url_for('results', score=score, total=len(questions), user_answers=user_answers))
+    return render_template('game.html', questions=questions)
 
-        # Initialize a list to store detailed results
-        detailed_results = []
-
-        # Question 1
-        jaweb1 = request.form.get('question1', '').strip().upper()
-        if jaweb1 in ["MA ELE JLEDE", "MA ELE JALAD"]:
-            score += 1
-            detailed_results.append("Question 1: Correct")
-        else:
-            detailed_results.append("Question 1: Incorrect")
-
-        # Question 2
-        jaweb2 = request.form.get('question2', '').strip().lower()
-        if jaweb2 in ["ana ma3ak", "jeye", "ana jeye", "ana ma3ak jeye", "ana jeye ma3ak", "bfout ma3ak", 
-                      "ba3mel hal shi", "b3mel hal shi", "b3mel hal shi ma3ak", "b3mel hal shi jeye", 
-                      "brou7", "brou7 ma3ak", "brou7 jeye", "brou7 ma3ak jeye"]:
-            score += 1
-            detailed_results.append("Question 2: Correct")
-        else:
-            detailed_results.append("Question 2: Incorrect")
-
-        # Question 3
-        jaweb3 = request.form.get('question3', '').strip().lower()
-        if jaweb3 in ["nfokho", "nfekho"]:
-            score += 1
-            detailed_results.append("Question 3: Correct")
-        else:
-            detailed_results.append("Question 3: Incorrect")
-
-        # Question 4
-        jaweb4 = request.form.get('question4', '').strip().lower()
-        if jaweb4 in ["mukhtal 3a2liyan", "mokhtal 3aqliyan", "mokhtal 3a2li", "mokhtal 3aqli", "mokhtal bi 3a2lo", 
-                      "mokhtal 3aqli", "mahboul", "mastoul"]:
-            score += 1
-            detailed_results.append("Question 4: Correct")
-        else:
-            detailed_results.append("Question 4: Incorrect")
-
-        # Question 5
-        jaweb5 = request.form.get('question5', '').strip().lower()
-        if jaweb5 in ["shou beke", "ashou beke"]:
-            score += 1
-            detailed_results.append("Question 5: Correct")
-        else:
-            detailed_results.append("Question 5: Incorrect")
-
-        # Final result
-        result = f"Your final score is {score} out of 5. You got {score / 5 * 100}% correct."
-        return render_template('result.html', result=result, name=name, detailed_results=detailed_results)
-
-    return render_template('game.html')
+# Route for the results page
+@app.route('/results')
+def results():
+    score = request.args.get('score', 0, type=int)
+    total = request.args.get('total', 0, type=int)
+    user_answers = request.args.getlist('user_answers')
+    print(f"Score: {score}, Total: {total}")
+    return render_template('results.html', score=score, total=total, questions=questions, user_answers=user_answers)
 
 # Run the app if this file is executed
 if __name__ == '__main__':
